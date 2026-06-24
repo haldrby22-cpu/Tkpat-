@@ -11,7 +11,6 @@
         .box { background: white; padding: 25px; border-radius: 15px; max-width: 400px; margin: auto; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
         input { width: 100%; padding: 12px; margin: 10px 0; border-radius: 8px; border: 1px solid #cbd5e1; box-sizing: border-box; }
         button { width: 100%; padding: 12px; background: #2563eb; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 16px; }
-        button:hover { background: #1d4ed8; }
     </style>
 </head>
 <body>
@@ -21,11 +20,10 @@
         <input type="text" id="restName" placeholder="اسم المطعم">
         <input type="text" id="restAddress" placeholder="العنوان">
         <button onclick="addRestaurant()">إضافة للموقع</button>
-        <p id="status" style="margin-top: 15px; font-size: 14px;"></p>
+        <p id="status" style="margin-top: 15px; font-size: 14px; color: #475569;"></p>
     </div>
 
     <script>
-        // إعدادات Firebase الخاصة بك
         const firebaseConfig = {
             apiKey: "AIzaSyApjsbc63GjzB7FYEZPBcJLKYc_delSe2Q",
             authDomain: "tlpat-65977.firebaseapp.com",
@@ -38,7 +36,7 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
-        function addRestaurant() {
+        async function addRestaurant() {
             const name = document.getElementById("restName").value;
             const address = document.getElementById("restAddress").value;
             const status = document.getElementById("status");
@@ -50,20 +48,21 @@
 
             status.innerHTML = "جاري الإضافة...";
 
-            db.collection("restaurants").add({
-                name: name,
-                address: address,
-                createdAt: firebase.firestore.FieldValue.serverTimestamp()
-            })
-            .then(() => {
+            try {
+                await db.collection("restaurants").add({
+                    name: name,
+                    address: address
+                });
+                
                 status.innerHTML = "✅ تمت الإضافة بنجاح!";
+                alert("تمت الإضافة بنجاح!");
                 document.getElementById("restName").value = "";
                 document.getElementById("restAddress").value = "";
-            })
-            .catch(error => {
+                
+            } catch (error) {
                 status.innerHTML = "❌ خطأ: " + error.message;
-                console.error("خطأ:", error);
-            });
+                alert("فشل الإرسال، الخطأ هو: " + error.message);
+            }
         }
     </script>
 </body>
