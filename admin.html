@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background: #0f172a; color: white; padding: 20px; display: flex; justify-content: center; }
+        .admin-card { background: #1e293b; padding: 30px; border-radius: 20px; width: 100%; max-width: 400px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
+        h1 { color: #8b5cf6; text-align: center; }
+        input, select { width: 100%; padding: 12px; margin: 10px 0; border-radius: 10px; border: none; background: #334155; color: white; box-sizing: border-box; }
+        button { width: 100%; padding: 15px; background: #8b5cf6; border: none; border-radius: 10px; color: white; font-weight: bold; cursor: pointer; margin-top: 10px; }
+    </style>
+</head>
+<body>
+
+<div class="admin-card">
+    <h1>🛠️ لوحة المدير</h1>
+    <input type="text" id="placeName" placeholder="اسم المكان (مطعم أو مقهى)">
+    <input type="text" id="placeAddress" placeholder="عنوان المكان">
+    <select id="placeType">
+        <option value="مطعم">مطعم 🍽️</option>
+        <option value="مقهى">مقهى ☕</option>
+    </select>
+    <button id="addPlaceBtn">إضافة المكان للقائمة</button>
+</div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
+    import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
+
+    // إعدادات Firebase الخاصة بك
+    const firebaseConfig = {
+        apiKey: "AIzaSyApjsbc63GjzB7FYEZPBcJLKYc_delSe2Q",
+        projectId: "tlpat-65977",
+        // ... باقي الإعدادات من ملفك السابق
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    document.getElementById("addPlaceBtn").addEventListener("click", async () => {
+        const name = document.getElementById("placeName").value;
+        const address = document.getElementById("placeAddress").value;
+        const type = document.getElementById("placeType").value;
+
+        if(!name || !address) return alert("يرجى ملء كافة البيانات");
+
+        try {
+            await addDoc(collection(db, "restaurants"), {
+                name: name,
+                address: address,
+                type: type, // يحفظ إذا كان مطعم أو مقهى
+                createdAt: new Date()
+            });
+            alert(`✅ تم إضافة ${type} ${name} بنجاح!`);
+            document.getElementById("placeName").value = "";
+            document.getElementById("placeAddress").value = "";
+        } catch (e) {
+            alert("خطأ: " + e.message);
+        }
+    });
+</script>
+</body>
+</html>
