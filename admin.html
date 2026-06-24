@@ -1,38 +1,32 @@
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-    <meta charset="UTF-8">
-    <title>فحص الاتصال</title>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
-</head>
-<body>
-    <h2>فحص الاتصال بـ Firebase</h2>
-    <button onclick="checkConnection()">اضغط للفحص</button>
-    <p id="result"></p>
+<script>
+    // ... (نفس الإعدادات السابقة)
+    
+    function addRestaurant() {
+        const name = document.getElementById("restName").value;
+        const address = document.getElementById("restAddress").value;
+        const status = document.getElementById("status");
 
-    <script>
-        const firebaseConfig = {
-            apiKey: "AIzaSyApjsbc63GjzB7FYEZPBcJLKYc_delSe2Q",
-            authDomain: "tlpat-65977.firebaseapp.com",
-            projectId: "tlpat-65977",
-            storageBucket: "tlpat-65977.firebasestorage.app",
-            messagingSenderId: "831053645639",
-            appId: "1:831053645639:web:ce0595983df188e9e62e62"
-        };
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore();
-
-        function checkConnection() {
-            document.getElementById("result").innerText = "جاري الاتصال...";
-            db.collection("restaurants").limit(1).get()
-            .then(() => {
-                document.getElementById("result").innerText = "✅ الاتصال سليم! يمكنك الإضافة.";
-            })
-            .catch(error => {
-                document.getElementById("result").innerText = "❌ فشل الاتصال: " + error.message;
-            });
+        if (!name || !address) {
+            alert("يرجى ملء الحقول!");
+            return;
         }
-    </script>
-</body>
-</html>
+
+        status.innerHTML = "جاري الإرسال...";
+
+        db.collection("restaurants").add({
+            name: name,
+            address: address
+        })
+        .then(function() {
+            status.innerHTML = "✅ تمت الإضافة بنجاح!";
+            alert("تم الإضافة!");
+            // مسح الحقول
+            document.getElementById("restName").value = "";
+            document.getElementById("restAddress").value = "";
+        })
+        .catch(function(error) {
+            status.innerHTML = "خطأ: " + error.code;
+            alert("خطأ: " + error.message);
+        });
+    }
+</script>
