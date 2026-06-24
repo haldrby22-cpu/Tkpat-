@@ -2,26 +2,14 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>لوحة تحكم الأدمن</title>
+    <title>فحص الاتصال</title>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
-    <style>
-        body { font-family: sans-serif; background: #f1f5f9; padding: 20px; text-align: center; }
-        .box { background: white; padding: 25px; border-radius: 15px; max-width: 400px; margin: auto; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-        input { width: 100%; padding: 12px; margin: 10px 0; border-radius: 8px; border: 1px solid #cbd5e1; box-sizing: border-box; }
-        button { width: 100%; padding: 12px; background: #2563eb; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 16px; }
-    </style>
 </head>
 <body>
-
-    <div class="box">
-        <h2>إضافة مطعم جديد</h2>
-        <input type="text" id="restName" placeholder="اسم المطعم">
-        <input type="text" id="restAddress" placeholder="العنوان">
-        <button onclick="addRestaurant()">إضافة للموقع</button>
-        <p id="status" style="margin-top: 15px; font-size: 14px; color: #475569;"></p>
-    </div>
+    <h2>فحص الاتصال بـ Firebase</h2>
+    <button onclick="checkConnection()">اضغط للفحص</button>
+    <p id="result"></p>
 
     <script>
         const firebaseConfig = {
@@ -32,37 +20,18 @@
             messagingSenderId: "831053645639",
             appId: "1:831053645639:web:ce0595983df188e9e62e62"
         };
-        
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
-        async function addRestaurant() {
-            const name = document.getElementById("restName").value;
-            const address = document.getElementById("restAddress").value;
-            const status = document.getElementById("status");
-
-            if (!name || !address) {
-                alert("يرجى ملء جميع الحقول!");
-                return;
-            }
-
-            status.innerHTML = "جاري الإضافة...";
-
-            try {
-                await db.collection("restaurants").add({
-                    name: name,
-                    address: address
-                });
-                
-                status.innerHTML = "✅ تمت الإضافة بنجاح!";
-                alert("تمت الإضافة بنجاح!");
-                document.getElementById("restName").value = "";
-                document.getElementById("restAddress").value = "";
-                
-            } catch (error) {
-                status.innerHTML = "❌ خطأ: " + error.message;
-                alert("فشل الإرسال، الخطأ هو: " + error.message);
-            }
+        function checkConnection() {
+            document.getElementById("result").innerText = "جاري الاتصال...";
+            db.collection("restaurants").limit(1).get()
+            .then(() => {
+                document.getElementById("result").innerText = "✅ الاتصال سليم! يمكنك الإضافة.";
+            })
+            .catch(error => {
+                document.getElementById("result").innerText = "❌ فشل الاتصال: " + error.message;
+            });
         }
     </script>
 </body>
