@@ -2,23 +2,58 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>طلبات فرشوط</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تطبيق طلبات فرشوط</title>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
     <style>
-        body { background: #0f172a; color: white; font-family: sans-serif; padding: 20px; text-align: center; }
-        .card { background: #1e293b; padding: 20px; margin: 15px auto; border-radius: 15px; width: 80%; cursor: pointer; }
+        body { font-family: sans-serif; background-color: #f8fafc; margin: 0; padding: 20px; text-align: center; }
+        .card { background: white; padding: 20px; margin: 15px auto; border-radius: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); width: 90%; max-width: 400px; }
+        h1 { color: #1e293b; }
     </style>
 </head>
 <body>
+
     <h1>🍽️ مطاعم فرشوط</h1>
-    <div id="app">
-        <div class="card" onclick="alert('بيتزا - 50 ج.م')">
-            <h3>مطعم البيت السعيد</h3>
-            <p>فرشوط - شارع المركز</p>
-        </div>
-        <div class="card" onclick="alert('كشري - 20 ج.م')">
-            <h3>مطعم التوحيد</h3>
-            <p>فرشوط - بجوار المحطة</p>
-        </div>
-    </div>
+    <div id="app">جاري تحميل المطاعم...</div>
+
+    <script>
+        // إعدادات Firebase الخاصة بمشروعك
+        const firebaseConfig = {
+            apiKey: "AIzaSyApjsbc63GjzB7FYEZPBcJLKYc_delSe2Q",
+            projectId: "tlpat-65977",
+            authDomain: "tlpat-65977.firebaseapp.com",
+            storageBucket: "tlpat-65977.firebasestorage.app",
+            messagingSenderId: "831053645639",
+            appId: "1:831053645639:web:ce0595983df188e9e62e62"
+        };
+
+        // تهيئة Firebase
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        // جلب البيانات من مجموعة restaurants
+        db.collection("restaurants").get().then((querySnapshot) => {
+            const appDiv = document.getElementById("app");
+            appDiv.innerHTML = ""; // مسح كلمة جاري التحميل
+            
+            if(querySnapshot.empty) {
+                appDiv.innerHTML = "<p>لا توجد مطاعم مضافة حالياً.</p>";
+                return;
+            }
+
+            querySnapshot.forEach((doc) => {
+                const rest = doc.data();
+                appDiv.innerHTML += `
+                    <div class="card">
+                        <h3>${rest.name || "مطعم بدون اسم"}</h3>
+                        <p>📍 ${rest.address || "العنوان غير محدد"}</p>
+                    </div>
+                `;
+            });
+        }).catch((error) => {
+            document.getElementById("app").innerHTML = "حدث خطأ في الاتصال: " + error.message;
+        });
+    </script>
 </body>
 </html>
